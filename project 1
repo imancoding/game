@@ -1,0 +1,115 @@
+class Ball(object):
+    def __init__(self):
+        self.pos = PVector(width/2, height/2)
+        self.speed = PVector(5, 4)
+        
+    def draw(self):
+        ellipse(self.pos.x, self.pos.y, 20, 20)
+        
+    def update(self):
+        self.pos = self.pos + self.speed
+    
+        if self.pos.x > width or self.pos.x < 0:
+            self.speed.x = - self.speed.x
+        
+        if self.pos.y > height or self.pos.y < 0:
+            self.speed.y = - self.speed.y
+
+def setup():
+    global ball
+    size(640, 480)
+    
+    ball = Ball()
+
+def draw():
+    global ball
+    
+    background(0)
+    
+    ball.draw()
+    ball.update()
+        
+class Brick(object):
+    def __init__(self, x, y, w, h):
+        self.pos = PVector(x, y)
+        self.size = PVector(w, h)
+        
+    def draw(self):
+        color(1,0,0)
+        rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+    
+class Paddle(object):
+    def __init__(self):
+        self.size = PVector(90, 5)
+        self.pos = PVector(mouseX, height - 50)
+        
+    def draw(self):
+        rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+
+    def update(self):
+        self.pos.x = mouseX
+
+
+def setup():
+    global ball, paddle, bricks
+    frameRate(200)
+    size(1000, 800)
+    
+    ball = Ball()
+    paddle = Paddle()
+    
+    bricks = []
+    for x in range(0, width, 50):
+        for y in range(0, 80, 20):
+            brick = Brick(x, y, 50, 20)
+            bricks.append(brick)
+
+def draw():
+    global ball, paddle, bricks
+    
+    background(random(0))
+    
+    # Draw the bricks
+    for brick in bricks:
+        brick.draw()
+        
+        # Check for intersection between ball and brick
+        bl = ball.pos.x - 10
+        br = ball.pos.x + 10
+        pl = brick.pos.x
+        pr = brick.pos.x + brick.size.x
+
+        bt = ball.pos.y - 10
+        bb = ball.pos.y + 10
+        pt = brick.pos.y
+        pb = brick.pos.y + brick.size.y
+        
+        if bl < pr and br > pl and bt < pb and bb > pt:
+            ball.speed.y = - ball.speed.y
+            bricks.remove(brick)
+    
+        
+    # Draw the balls
+    ball.draw()
+    ball.update()
+    
+    # Draw the paddle
+    paddle.draw()
+    paddle.update()
+    
+    # Check for intersection between ball and paddle
+    bl = ball.pos.x - 10
+    br = ball.pos.x + 10
+    pl = paddle.pos.x
+    pr = paddle.pos.x + paddle.size.x
+    
+    bt = ball.pos.y - 10
+    bb = ball.pos.y + 10
+    pt = paddle.pos.y
+    pb = paddle.pos.y + paddle.size.y
+    
+    if bl < pr and br > pl and bt < pb and bb > pt:
+        ball.speed.y = - ball.speed.y
+        
+        
+    
